@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+
+import json
+import os
+import sys
+import re
+
+def lookup(word):
+    response = os.popen(f'echo {word} | hunspell').read()
+
+    if "Hunspell" in response:
+        response = response.replace(response[:15], '', 1)
+
+    startLocation = response.find(":") + 1
+    response = response[startLocation:None]
+
+    result = os.linesep.join([s for s in response.splitlines() if s])
+    # return re.sub(', ', ' ', result)
+    return result
+
+# App
+class App(object):
+    def __init__(self):
+        self.match = None
+
+    def activate(self, index):
+        if not self.match:
+            return
+
+        lookup(self.match)
+        sys.stdout.write('"Close"\n')
+        sys.stdout.flush()
+
+    def search(self, query):
+        self.match = query.split(' ', 1)[1]
+
+        sys.stdout.write(json.dumps({
+            'Append': {
+                'id': 0,
+                'name': 'Spell checker',
+                'description': f'{lookup(self.match)}',
+                'keywords': None,
+                'icon': None,
+                'exec': None,
+                'window': None
+            }
+        }))
+        sys.stdout.write('\n')
+
+        sys.stdout.write('"Finished"\n')
+        sys.stdout.flush()
+
+def main():
+    app = App()
+
+    for line in sys.stdin:
+        try:
+            request = json.loads(line)
+            if 'Search' in request:
+                app.search(request['Search'])
+            elif 'Activate' in request:
+                app.activate(request['Activate'])
+        except json.decoder.JSONDecodeError:
+            pass
+
+if __name__ == '__main__':
+    main()
