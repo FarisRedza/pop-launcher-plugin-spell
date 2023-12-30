@@ -14,9 +14,17 @@ def lookup(word):
     startLocation = response.find(":") + 1
     response = response[startLocation:None]
 
-    result = os.linesep.join([s for s in response.splitlines() if s])
-    # return re.sub(', ', ' ', result)
+    response = os.linesep.join([s for s in response.splitlines() if s])
+    response = re.sub(', ', ' ', response)
+    result = response.split()
+
+    if '*' in result:
+        result = [word]
+        
     return result
+
+def clipboard(word):
+    os.system('echo ' + word + ' | xclip -sel clip')
 
 # App
 class App(object):
@@ -24,28 +32,33 @@ class App(object):
         self.match = None
 
     def activate(self, index):
-        if not self.match:
+        if not self.matches:
             return
+        
+        with os.popen('xclip -sel clip', 'w') as stream:
+            stream.write(self.matches[index])
+            stream.flush()
 
-        lookup(self.match)
         sys.stdout.write('"Close"\n')
         sys.stdout.flush()
 
     def search(self, query):
-        self.match = query.split(' ', 1)[1]
+        query = query.split(' ', 1)[1]
+        self.matches = lookup(query)
 
-        sys.stdout.write(json.dumps({
-            'Append': {
-                'id': 0,
-                'name': 'Spell checker',
-                'description': f'{lookup(self.match)}',
-                'keywords': None,
-                'icon': None,
-                'exec': None,
-                'window': None
-            }
-        }))
-        sys.stdout.write('\n')
+        for index in range(len(self.matches)):
+            sys.stdout.write(json.dumps({
+                'Append': {
+                    'id': index,
+                    'name': f'Spell check: {query}',
+                    'description': f'{self.matches[index]}',
+                    'keywords': None,
+                    'icon': None,
+                    'exec': None,
+                    'window': None
+                }
+            }))
+            sys.stdout.write('\n')
 
         sys.stdout.write('"Finished"\n')
         sys.stdout.flush()
