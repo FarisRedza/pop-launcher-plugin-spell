@@ -50,8 +50,8 @@ class App(object):
             sys.stdout.write(json.dumps({
                 'Append': {
                     'id': index,
-                    'name': f'Spell check: {query}',
-                    'description': f'{self.matches[index]}',
+                    'name': f'{self.matches[index]}',
+                    'description': f'Spell check: {query}',
                     'keywords': None,
                     'icon': None,
                     'exec': None,
