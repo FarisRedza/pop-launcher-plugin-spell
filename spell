@@ -20,6 +20,9 @@ def lookup(word):
 
     if '*' in result:
         result = [word]
+
+    if '0' in result:
+        result = ["No match found"]
         
     return result
 
