@@ -3,32 +3,14 @@
 import json
 import sys
 import os
-import re
-
-def lookup(word):
-    response = os.popen(f'echo {word} | hunspell').read()
-
-    if "Hunspell" in response:
-        response = response.replace(response[:15], '', 1)
-
-    startLocation = response.find(":") + 1
-    response = response[startLocation:None]
-
-    response = os.linesep.join([s for s in response.splitlines() if s])
-    response = re.sub(', ', ' ', response)
-    result = response.split()
-
-    if '*' in result:
-        result = [word]
-
-    if '0' in result:
-        result = ["No match found"]
-        
-    return result
 
 class App(object):
     def __init__(self):
         self.match = None
+
+    h = 'Hunspell'
+    find_version = os.popen('hunspell -v').read()
+    version = find_version[find_version.find(h)+len(h):find_version.find(h)+len(h)+6]
 
     def activate(self, index):
         if not self.matches:
@@ -41,15 +23,34 @@ class App(object):
         sys.stdout.write('"Close"\n')
         sys.stdout.flush()
 
+    def search_word(self, query):
+        response = os.popen(f'echo {query} | hunspell').read()
+
+        response = response.strip(f'{self.h} + {self.version}\n')
+
+        startLocation = response.find(":") + 1
+        response = response[startLocation:None]
+
+        response = os.linesep.join([s for s in response.splitlines() if s]).replace(', ', ' ')
+        result = response.split()
+
+        if '*' in result:
+            result = [query]
+
+        if '0' in result:
+            result = ["No match found"]
+            
+        return result
+
     def search(self, query):
         query = query.split(' ', 1)[1]
-        self.matches = lookup(query)
+        self.matches = self.search_word(query)
 
-        for index in range(len(self.matches)):
+        for index, word in enumerate(self.matches):
             sys.stdout.write(json.dumps({
                 'Append': {
                     'id': index,
-                    'name': f'{self.matches[index]}',
+                    'name': word,
                     'description': f'Spell check: {query}',
                     'keywords': None,
                     'icon': None,
