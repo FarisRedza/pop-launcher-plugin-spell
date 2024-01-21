@@ -2,7 +2,7 @@
 
 Uses hunspell\
 ```sudo apt install hunspell```\
-```nix-env -iA nixpkgs.hunspell```\
+```nix-env -iA nixpkgs.hunspell```
 
 Requires xclip for copying to clipboard\
 ```sudo apt install xclip```\
