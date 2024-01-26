@@ -1,5 +1,5 @@
 # pop-launcher-plugin-spell
-A spell checking plugin for pop-launcher using hunspell. Searches for the closest matching spelling and copies it to your clipboard 
+A spell checking plugin for [pop-launcher](https://github.com/pop-os/launcher) using [hunspell](https://github.com/hunspell/hunspell). Searches for the closest matching spelling and copies it to your clipboard 
 
 ### Dependencies
 [hunspell](https://github.com/hunspell/hunspell)\
