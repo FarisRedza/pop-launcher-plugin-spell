@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+
+import json
+import sys
+import os
+
+class App(object):
+    def __init__(self):
+        self.match = None
+
+    h = 'Hunspell'
+    find_version = os.popen('hunspell -v').read()
+    version = find_version[find_version.find(h)+len(h):find_version.find(h)+len(h)+6]
+
+    def activate(self, index):
+        if not self.matches:
+            return
+        
+        with os.popen('xclip -selection clipboard', 'w') as stream:
+            stream.write(self.matches[index])
+            stream.flush()
+
+        sys.stdout.write('"Close"\n')
+        sys.stdout.flush()
+
+    def search_word(self, query):
+        response = os.popen(f'echo {query} | hunspell').read()
+
+        response = response.strip(f'{self.h} + {self.version}\n')
+
+        startLocation = response.find(":") + 1
+        response = response[startLocation:None]
+
+        response = os.linesep.join([s for s in response.splitlines() if s]).replace(', ', ' ')
+        result = response.split()
+
+        if '*' in result:
+            result = [query]
+
+        if '0' in result:
+            result = ["No match found"]
+            
+        return result
+
+    def search(self, query):
+        query = query.split(' ', 1)[1]
+        self.matches = self.search_word(query)
+
+        for index, word in enumerate(self.matches):
+            sys.stdout.write(json.dumps({
+                'Append': {
+                    'id': index,
+                    'name': word,
+                    'description': f'Spell check: {query}',
+                    'keywords': None,
+                    'icon': None,
+                    'exec': None,
+                    'window': None
+                }
+            }))
+            sys.stdout.write('\n')
+
+        sys.stdout.write('"Finished"\n')
+        sys.stdout.flush()
+
+def main():
+    app = App()
+
+    for line in sys.stdin:
+        try:
+            request = json.loads(line)
+            if 'Search' in request:
+                app.search(request['Search'])
+            elif 'Activate' in request:
+                app.activate(request['Activate'])
+        except json.decoder.JSONDecodeError:
+            pass
+
+if __name__ == '__main__':
+    main()

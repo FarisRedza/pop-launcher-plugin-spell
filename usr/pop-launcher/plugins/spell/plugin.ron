@@ -1,0 +1,11 @@
+(
+    name: "Spell checker",
+    description: "Syntax: spell <word>",
+    query: (
+        regex: "^(spell)\\s.*",
+        help: "spell",
+        isolate: true
+    ),
+    bin: (path: "spell"),
+    icon: Name("tools-check-spelling-symbolic")
+)
