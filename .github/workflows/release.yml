@@ -14,12 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          path: "REPO"
+        uses: actions/checkout@main
 
       - name: Build the package
-        uses: actions/checkout@main
         run: |
           make build_deb_package
 
