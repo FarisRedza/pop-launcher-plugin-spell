@@ -19,6 +19,7 @@ jobs:
           path: "REPO"
 
       - name: Build the package
+        uses: actions/checkout@main
         run: |
           make build_deb_package
 
