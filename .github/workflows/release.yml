@@ -18,7 +18,7 @@ jobs:
 
       - name: Build the package
         run: |
-          make build_deb_package
+          make deb_package
 
       - name: Release the Package
         uses: softprops/action-gh-release@v1
