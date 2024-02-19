@@ -23,5 +23,4 @@ For a lot of cases where a word has a suffix, the plugin assumes the spelling is
 
 ### Todo
 - [ ] Replace hunspell with aspell
-- [ ] Include a Wayland compatible method of copying to clipboard as xclip seems to lack this functionality
 - [ ] Modify the GitHub action for creating a deb package to be closer to the method used for packaging for debian repos
