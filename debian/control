@@ -1,9 +1,9 @@
 Package: pop-launcher-plugin-spell
-Version: 0.1
+Version: 0.2
 Architecture: all
 Section: misc
 Essential: no
 Priority: optional
-Depends: pop-launcher, hunspell, xclip
+Depends: pop-launcher, xclip
 Maintainer: Faris Redza <faris.redza1999@gmail.com>
-Description: A spell checking plugin for pop-launcher using hunspell as a backend.
+Description: A spell checking plugin for pop-launcher using aspell as a backend

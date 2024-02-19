@@ -8,10 +8,6 @@ class App(object):
     def __init__(self):
         self.match = None
 
-    h = 'Hunspell'
-    find_version = os.popen('hunspell -v').read()
-    version = find_version[find_version.find(h)+len(h):find_version.find(h)+len(h)+6]
-
     def activate(self, index):
         if not self.matches:
             return
@@ -24,9 +20,7 @@ class App(object):
         sys.stdout.flush()
 
     def search_word(self, query):
-        response = os.popen(f'echo {query} | hunspell').read()
-
-        response = response.strip(f'{self.h} + {self.version}\n')
+        response = os.popen(f'echo {query} | aspell -a | tail -n +2').read()
 
         startLocation = response.find(":") + 1
         response = response[startLocation:None]
