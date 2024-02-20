@@ -3,7 +3,7 @@ A spell checking plugin for [pop-launcher](https://github.com/pop-os/launcher) u
 
 ### Dependencies
 [aspell](https://github.com/GNUAspell/aspell)\
-This is preinstalled in Pop!_OS and most other Linux distributions
+This is preinstalled in Pop!_OS and most other Linux distributions\
 Debian/Ubuntu and derivatives - `sudo apt install aspell`\
 Nix package - `nix-env -iA nixpkgs.aspell`
 
