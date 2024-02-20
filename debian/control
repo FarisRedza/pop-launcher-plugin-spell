@@ -11,5 +11,5 @@ Rules-Requires-Root: no
 
 Package: pop-launcher-plugin-spell
 Architecture: all
-Depends: xclip, ${shlibs:Depends}, ${misc:Depends}
+Depends: xclip, ${misc:Depends}, ${shlibs:Depends}
 Description: A spell checking plugin for pop-launcher using aspell as a backend
