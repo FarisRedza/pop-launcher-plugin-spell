@@ -23,4 +23,4 @@ In pop launcher type spell followed by your query to search for the closest matc
 
 ### Todo
 - [x] Replace hunspell with aspell
-- [ ] Modify the GitHub action for creating a deb package to be closer to the method used for packaging for debian repos
+- [x] Modify the GitHub action for creating a deb package to be closer to the method used for packaging for debian repos

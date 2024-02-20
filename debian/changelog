@@ -1,0 +1,17 @@
+pop-launcher-plugin-spell (0.3-1) jammy; urgency=medium
+
+  * Improved debian packaging system and added usage example
+
+ -- Faris Redza <faris.redza1999@gmail.com>  Tue, 20 Feb 2024 21:10:07 +0000
+
+pop-launcher-plugin-spell (0.2-1) jammy; urgency=medium
+
+  * Replaced hunspell with aspell
+
+ -- Faris Redza <faris.redza1999@gmail.com>  Mon, 19 Feb 2024 22:10:20 +0000
+
+pop-launcher-plugin-spell (0.1-1) jammy; urgency=medium
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Faris Redza <faris.redza1999@gmail.com>  Sun, 11 Feb 2024 15:00:18 +0000

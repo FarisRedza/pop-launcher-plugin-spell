@@ -18,9 +18,11 @@ jobs:
 
       - name: Build the package
         run: |
-          make deb_package
+          sudo apt install debmake debhelper
+          debmake -p pop-launcher-plugin-spell -t
+          debuild -us -uc
 
       - name: Release the Package
         uses: softprops/action-gh-release@v1
         with:
-          files: pop-launcher-plugin-spell_0.2-1_all.deb
+          files: ../pop-launcher-plugin-spell*.deb
