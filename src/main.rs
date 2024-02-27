@@ -1,23 +1,55 @@
-use std::process::{Command, Stdio};
+use std::{io::{self, Read}, process::{Command, Stdio}};
+use serde_json::{Deserializer, Serializer};
 use pop_launcher::*;
 
 fn main() {
-    let query = Request::Search("tetsed".to_string());
-    search(query);
-    println!("{:?}", response);
+    let mut input = String::new();
+    println!("Enter JSON input:");
+    io::stdin().read_to_string(&mut input).expect("Failed to read line");
+    
+    // Parse JSON input into Request enum
+    let request: Request = match serde_json::from_str(&input) {
+        Ok(req) => req,
+        Err(err) => {
+            panic!("Failed to parse JSON: {}", err);
+        }
+    };
+
+    // Handle the received Request enum
+    match request {
+        Request::Activate(index) => {
+            println!("Activate with index: {}", index);
+            // Handle Activate variant
+        }
+        Request::Search(query) => {
+            let response = search(pop_launcher::Request::Search(query));
+            println!("Search query: {:?}", response);
+            // Handle Search variant
+        }
+        _ => ()
+    }
+
 }
 
 fn search(query: Request) {
     match query {
-        Request::Activate(_) => todo!(),
-        Request::ActivateContext { id, context } => todo!(),
-        Request::Complete(_) => todo!(),
-        Request::Context(_) => todo!(),
-        Request::Exit => todo!(),
-        Request::Interrupt => todo!(),
-        Request::Quit(_) => todo!(),
-        Request::Search(_) => todo!(),
-    }
+        Request::Search(s) => {
+            let search_query = s;
+            let checked_query = check_spelling(&search_query);
+            let response = PluginResponse::Append(PluginSearchResult {
+                id: 0,
+                name: checked_query[0].clone(),
+                description: search_query,
+                icon: None,
+                keywords: None,
+                exec: None,
+                window: None,
+            });
+
+            println!("{:?}", response);
+        }
+        _ => todo!()
+    };
 }
 
 fn check_spelling(query: &str) -> Vec<String> {
