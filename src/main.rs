@@ -5,7 +5,9 @@ use pop_launcher::*;
 fn main() {
     let mut input = String::new();
     println!("Enter JSON input:");
-    io::stdin().read_to_string(&mut input).expect("Failed to read line");
+    io::stdin()
+        .read_to_string(&mut input)
+        .expect("Failed to read line");
     
     let request: Request = match serde_json::from_str(&input) {
         Ok(req) => req,
@@ -20,8 +22,7 @@ fn main() {
         }
         Request::Search(query) => {
             let response = search(pop_launcher::Request::Search(query));
-            // println!("Search query: {:?}", response);
-            println!("Hello world");
+            println!("Search query: {:?}", response);
         }
         _ => ()
     }
@@ -42,7 +43,6 @@ fn search(query: Request) {
                 exec: None,
                 window: None,
             });
-
             println!("{:?}", response);
         }
         _ => todo!()
