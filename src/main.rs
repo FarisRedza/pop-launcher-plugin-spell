@@ -7,7 +7,6 @@ fn main() {
     println!("Enter JSON input:");
     io::stdin().read_to_string(&mut input).expect("Failed to read line");
     
-    // Parse JSON input into Request enum
     let request: Request = match serde_json::from_str(&input) {
         Ok(req) => req,
         Err(err) => {
@@ -15,16 +14,14 @@ fn main() {
         }
     };
 
-    // Handle the received Request enum
     match request {
         Request::Activate(index) => {
             println!("Activate with index: {}", index);
-            // Handle Activate variant
         }
         Request::Search(query) => {
             let response = search(pop_launcher::Request::Search(query));
-            println!("Search query: {:?}", response);
-            // Handle Search variant
+            // println!("Search query: {:?}", response);
+            println!("Hello world");
         }
         _ => ()
     }
