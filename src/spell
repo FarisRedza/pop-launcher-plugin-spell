@@ -2,7 +2,7 @@
 
 import json
 import sys
-import os
+import subprocess
 
 class App(object):
     def __init__(self):
@@ -12,20 +12,21 @@ class App(object):
         if not self.matches:
             return
         
-        with os.popen('xclip -selection clipboard', 'w') as stream:
-            stream.write(self.matches[index])
-            stream.flush()
+        with subprocess.Popen(['xclip', '-selection', 'clipboard'], stdin=subprocess.PIPE) as process:
+            process.stdin.write(self.matches[index].encode())
+            process.stdin.close()
 
         sys.stdout.write('"Close"\n')
         sys.stdout.flush()
 
     def search_word(self, query):
-        response = os.popen(f'echo {query} | aspell -a | tail -n +2').read()
+        command = f'echo {query} | aspell -a | tail -n +2'
+        response = subprocess.run(command, shell=True, text=True, capture_output=True).stdout
 
         startLocation = response.find(":") + 1
-        response = response[startLocation:None]
+        response = response[startLocation:]
 
-        response = os.linesep.join([s for s in response.splitlines() if s]).replace(', ', ' ')
+        response = '\n'.join([s for s in response.splitlines() if s]).replace(', ', ' ')
         result = response.split()
 
         if '*' in result:
