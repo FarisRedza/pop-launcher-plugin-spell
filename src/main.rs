@@ -1,93 +1,115 @@
-use std::{io::{self, Read}, process::{Command, Stdio}};
-use serde_json::{Deserializer, Serializer};
+use std::io::{self, BufRead, Write};
+
 use pop_launcher::*;
+use copypasta::ClipboardProvider;
 
 fn main() {
+    // Read JSON input from stdin
+    let stdin = io::stdin();
+    let handle = stdin.lock();
+
+    // Collect input into a string
     let mut input = String::new();
-    println!("Enter JSON input:");
-    io::stdin()
-        .read_to_string(&mut input)
-        .expect("Failed to read line");
-    
-    let request: Request = match serde_json::from_str(&input) {
-        Ok(req) => req,
-        Err(err) => {
-            panic!("Failed to parse JSON: {}", err);
-        }
-    };
-
-    match request {
-        Request::Activate(index) => {
-            println!("Activate with index: {}", index);
-        }
-        Request::Search(query) => {
-            let response = search(pop_launcher::Request::Search(query));
-            println!("Search query: {:?}", response);
-        }
-        _ => ()
+    for line in handle.lines() {
+        input.push_str(&line.unwrap());
     }
 
+    // Parse the JSON input
+    let json_value: serde_json::Value = serde_json::from_str(&input)
+        .expect("Failed to parse JSON");
+
+    // Match on keys and call corresponding functions
+    match json_value {
+        serde_json::Value::Object(map) => {
+            for (key, value) in map {
+                match key.as_str() {
+                    "Search" => check_spelling(value.to_string()),
+                    "Exit" => break,
+                    _ => println!("Unhandled key: {}", key),
+                }
+            }
+        },
+        _ => println!("Expected a JSON object."),
+    }
 }
 
-fn search(query: Request) {
-    match query {
-        Request::Search(s) => {
-            let search_query = s;
-            let checked_query = check_spelling(&search_query);
-            let response = PluginResponse::Append(PluginSearchResult {
-                id: 0,
-                name: checked_query[0].clone(),
-                description: search_query,
-                icon: None,
-                keywords: None,
-                exec: None,
-                window: None,
-            });
-            println!("{:?}", response);
-        }
-        _ => todo!()
-    };
-}
+// fn main() {
+//     let mut input: String = String::new();
 
-fn check_spelling(query: &str) -> Vec<String> {
-    let echo: std::process::ChildStdout = Command::new("echo")
-        .arg(query)
-        .stdout(Stdio::piped())
-        .spawn()
-        .expect("Failed to execute echo command")
-        .stdout
-        .expect("Failed to capture echo command output");
+//     println!("Please enter query: ");
+//     std::io::stdin()
+//         .read_line(&mut input)
+//         .expect("Failed to read line");
 
-    let aspell: std::process::ChildStdout = Command::new("aspell")
+//     check_spelling(input.trim().to_string());
+// }
+
+fn check_spelling(word: String) {
+    let mut aspell: std::process::Child = std::process::Command::new("aspell")
         .arg("-a")
-        .stdin(Stdio::from(echo))
-        .stdout(Stdio::piped())
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
         .spawn()
-        .expect("Failed to execute aspell command")
-        .stdout
-        .expect("Failed to capture aspell command output");
+        .expect("Failed to start `aspell` command");
 
-    let tail: std::process::Output = Command::new("tail")
-        .args(["-n","+2"])
-        .stdin(Stdio::from(aspell))
-        .output()
-        .expect("Failed to execute tail command");
+    if let Some(stdin) = aspell
+        .stdin
+        .as_mut() {
+            stdin
+                .write_all(word.as_bytes())
+                .expect("Failed to write to stdin");
+        }
 
-    let aspell_output: String = String::from_utf8_lossy(&tail.stdout)
-        .to_string();
+    let output: std::process::Output = aspell
+        .wait_with_output()
+        .expect("Failed to read stdout");
 
-    if aspell_output.contains("*") {
-        return vec!["Correct spelling".to_string()];
+    let stdout: std::borrow::Cow<'_, str> = String::from_utf8_lossy(&output.stdout);
+    let result: &str = stdout
+        .splitn(2, '\n')
+        .nth(1)
+        .unwrap_or("")
+        .trim();
+
+    let result_type: char = result
+        .chars()
+        .next()
+        .unwrap();
+
+    let result: &str = stdout
+        .splitn(2, ':')
+        .nth(1)
+        .unwrap_or("")
+        .trim();
+
+    let result_list: Vec<String> = match result_type {
+        '*' => vec![String::from("Correct spelling")],
+        '#' => vec![String::from("No match found")],
+        _ => result.split(',').map(|word| word.trim().to_string()).collect(),
+    };
+
+    let mut ctx: copypasta::x11_clipboard::X11ClipboardContext = copypasta::ClipboardContext::new()
+        .unwrap();
+    let msg: &String = match result_list.len() {
+        1 => &word,
+        _ => &result_list[0]
+    };
+    ctx.set_contents(msg.to_owned()).unwrap();
+    let _content: String = ctx.get_contents().unwrap();
+
+    for (i, result) in result_list.iter().enumerate() {
+        let (name, description) = if result_list.len() == 1 {
+            (word.clone(), result.clone())
+        } else {
+            (result.clone(), word.clone())
+        };
+    
+        let response = PluginResponse::Append(PluginSearchResult {
+            id: i as Indice,
+            name: name,
+            description: format!("Spell check: {}", description),
+            ..Default::default()
+        });
+        println!("{:?}", response);
     }
-    if aspell_output.contains("#") {
-        return vec!["No match found".to_string()];
-    }
-    let start_index: usize = aspell_output
-        .find(":")
-        .unwrap_or(0);
-
-    return aspell_output[start_index + 1..]
-        .split(", ")
-        .map(|s| s.trim().to_string())
-        .collect()
 }
