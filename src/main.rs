@@ -83,13 +83,13 @@ impl App {
     }
 
     fn search(&mut self, query: &str) {
-        let query = query
+        let query: String = query
             .split_whitespace()
             .skip(1)
             .collect::<Vec<&str>>()
             .join(" ");
 
-        let result = self.check_spelling(&query);
+        let result: Vec<String> = self.check_spelling(&query);
 
         if result[0] == String::from("Correct spelling") || result[0] == String::from("No match found") {
             self.matches = Some(vec![query.clone(); result.len()]);
@@ -119,19 +119,20 @@ fn main() {
     let stdin: io::Stdin = io::stdin();
 
     for line in stdin.lock().lines() {
-        if let Ok(line) = line {
-            let request: serde_json::Value = serde_json::from_str(&line)
-                .unwrap_or(serde_json::Value::Null);
-            
-            if let Some(search_query) = request.get("Search") {
-                if let Some(query) = search_query.as_str() {
-                    app.search(query);
-                }
-            } else if let Some(activate_idx) = request.get("Activate") {
-                if let Some(index) = activate_idx.as_u64() {
-                    app.activate(index as usize);
-                }
-            }
+        let line: String = match line {
+            Ok(line) => line,
+            Err(_) => continue,
+        };
+
+        let request: serde_json::Value = serde_json::from_str(&line).unwrap_or(serde_json::Value::Null);
+
+        if let Some(query) = request.get("Search").and_then(|v| v.as_str()) {
+            app.search(query);
+            continue;
+        }
+
+        if let Some(index) = request.get("Activate").and_then(|v| v.as_u64()) {
+            app.activate(index as usize);
         }
     }
 }
