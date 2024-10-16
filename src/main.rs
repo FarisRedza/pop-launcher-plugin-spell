@@ -4,12 +4,16 @@ use pop_launcher::*;
 use copypasta::ClipboardProvider;
 
 struct App {
-    matches: Option<Vec<String>>
+    matches: Option<Vec<String>>,
+    descriptions: Option<Vec<String>>
 }
 
 impl App {
     fn new() -> Self {
-        App { matches: None }
+        App {
+            matches: None,
+            descriptions: None
+        }
     }
 
     fn check_spelling(&self, word: &str) -> Vec<String> {
@@ -72,26 +76,35 @@ impl App {
                 let _content: String = ctx
                     .get_contents()
                     .unwrap();
+
                 println!("\"Close\"");
             }
         }
     }
 
     fn search(&mut self, query: &str) {
-        let query = query.split_whitespace().skip(1).collect::<Vec<&str>>().join(" ");
-        self.matches = Some(self.check_spelling(&query));
+        let query = query
+            .split_whitespace()
+            .skip(1)
+            .collect::<Vec<&str>>()
+            .join(" ");
 
-        if let Some(matches) = &self.matches {
+        let result = self.check_spelling(&query);
+
+        if result[0] == String::from("Correct spelling") || result[0] == String::from("No match found") {
+            self.matches = Some(vec![query.clone(); result.len()]);
+            self.descriptions = Some(result);
+        } else {
+            self.matches = Some(result.clone());
+            self.descriptions = Some(vec![query.clone(); result.len()]);
+        }
+
+        if let (Some(matches), Some(descriptions)) = (&self.matches, &self.descriptions) {
             for (index, word) in matches.iter().enumerate() {
-                let (name, description) = if matches.len() == 1 {
-                    (query.clone(), word.clone())
-                } else {
-                    (word.clone(), query.clone())
-                };
                 let response: PluginResponse = PluginResponse::Append( PluginSearchResult {
                     id: index as u32,
-                    name: name,
-                    description: format!("Spell check: {}", description),
+                    name: word.to_string(),
+                    description: format!("Spell check: {}", descriptions[index]),
                     ..Default::default()
                 });
                 println!("{}", serde_json::to_string(&response).unwrap());
