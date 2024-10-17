@@ -2,24 +2,11 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: pop-launcher-plugin-spell
 Upstream-Contact: Faris Redza <faris.redza1999@gmail.com>
 Source: https://github.com/FarisRedza/pop-launcher-plugin-spell
-#
-# Please double check copyright with the licensecheck(1) command.
 
-Files:     .github/workflows/release.yml
-           .gitignore
-           Makefile
-           README.md
-           src/plugin.ron
-           src/spell
-Copyright: __NO_COPYRIGHT_NOR_LICENSE__
-License:   __NO_COPYRIGHT_NOR_LICENSE__
-
-#----------------------------------------------------------------------------
-# Files marked as NO_LICENSE_TEXT_FOUND may be covered by the following
-# license/copyright files.
-
-#----------------------------------------------------------------------------
-# License file: LICENSE
+Files:     *
+Copyright: 2024 Faris Redza
+License:   MIT
+ .
  MIT License
  .
  Copyright (c) 2024 Faris Redza

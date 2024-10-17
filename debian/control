@@ -2,7 +2,9 @@ Source: pop-launcher-plugin-spell
 Section: misc
 Priority: optional
 Maintainer: Faris Redza <faris.redza1999@gmail.com>
-Build-Depends: debhelper-compat (= 13)
+Build-Depends:
+    debhelper-compat (= 13),
+    dh-cargo
 Standards-Version: 4.6.0
 Homepage: https://github.com/FarisRedza/pop-launcher-plugin-spell
 Vcs-Browser: https://github.com/FarisRedza/pop-launcher-plugin-spell
@@ -10,6 +12,15 @@ Vcs-Git: https://github.com/FarisRedza/pop-launcher-plugin-spell.git
 Rules-Requires-Root: no
 
 Package: pop-launcher-plugin-spell
-Architecture: all
-Depends: xclip, ${misc:Depends}, ${shlibs:Depends}
-Description: A spell checking plugin for pop-launcher using aspell as a backend
+Architecture: any
+Depends:
+    aspell,
+    ${misc:Depends},
+    ${shlibs:Depends}
+Description: Spell checking plugin for pop-launcher using aspell as a backend
+ This package provides a spell checking plugin for pop-launcher using aspell.
+ Searches for the closest matching spelling and copies it to your clipboard.
+ .
+ Usage:
+ In pop launcher type spell followed by your query to search for the closest
+ matching spelling. Pressing enter copies the result into the clipboard.

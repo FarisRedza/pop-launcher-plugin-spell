@@ -1,0 +1,13 @@
+[package]
+name = "spell"
+version = "0.1.0"
+edition = "2021"
+
+[profile.release]
+strip = true
+
+[dependencies]
+copypasta = "0.10.1"
+pop-launcher = "1.1.0"
+serde = "1.0.210"
+serde_json = "1.0.128"
