@@ -18,7 +18,7 @@ jobs:
 
       - name: Build the package
         run: |
-          sudo apt install debmake debhelper
+          sudo apt install debmake debhelper dh-cargo
           debmake -p pop-launcher-plugin-spell -t
           debuild -us -uc
 

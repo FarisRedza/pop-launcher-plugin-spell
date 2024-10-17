@@ -1,3 +1,13 @@
+pop-launcher-plugin-spell (0.4-1~jammy) jammy; urgency=medium
+
+  * Rewritten in rust
+  * Removed dependency on xclip
+  * Works on both X11 and Wayland
+  * Correct spelling feedback
+  * Copy query to clipboard if correct spelling or no match found
+
+ -- Faris Redza <faris.redza1999@gmail.com>  Wed, 16 Oct 2024 20:01:45 +0100
+
 pop-launcher-plugin-spell (0.3-1) jammy; urgency=medium
 
   * Improved debian packaging system and added usage example
@@ -12,6 +22,6 @@ pop-launcher-plugin-spell (0.2-1) jammy; urgency=medium
 
 pop-launcher-plugin-spell (0.1-1) jammy; urgency=medium
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * Initial release
 
  -- Faris Redza <faris.redza1999@gmail.com>  Sun, 11 Feb 2024 15:00:18 +0000
