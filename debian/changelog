@@ -1,3 +1,9 @@
+pop-launcher-plugin-spell (0.4-1~noble) noble; urgency=medium
+
+  * Packaged for noble
+
+ -- Faris Redza <faris.redza1999@gmail.com>  Tue, 22 Oct 2024 18:03:59 +0100
+
 pop-launcher-plugin-spell (0.4-1~jammy) jammy; urgency=medium
 
   * Rewritten in rust
