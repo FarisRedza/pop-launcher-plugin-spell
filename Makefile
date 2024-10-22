@@ -13,11 +13,10 @@ build: src/main.rs
 	fi
 
 install: build
-	install -D src/plugin.ron \
+	install -Dm0644 src/plugin.ron \
 		-t $(DESTDIR)$(prefix)/pop-launcher/plugins/spell
-	chmod -x $(DESTDIR)$(prefix)/pop-launcher/plugins/spell/plugin.ron
 
-	install -D target/release/spell \
+	install -Dm0755 target/release/spell \
 		-t $(DESTDIR)$(prefix)/pop-launcher/plugins/spell
 
 vendor:
