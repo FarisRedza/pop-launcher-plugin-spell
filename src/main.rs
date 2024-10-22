@@ -1,5 +1,5 @@
 use std::io::{self, BufRead, Write};
-
+use futures_lite::stream::StreamExt;
 use pop_launcher::*;
 use copypasta::ClipboardProvider;
 
@@ -65,12 +65,12 @@ impl App {
         return result_list;
     }
     
-    fn activate(&self, index: usize) {
+    fn activate(&self, index: u32) {
         if let Some(matches) = &self.matches {
             if !matches.is_empty() {
                 let mut ctx: copypasta::x11_clipboard::X11ClipboardContext = copypasta::ClipboardContext::new()
                     .unwrap();
-                let selection: &String = &matches[index];
+                let selection: &String = &matches[index as usize];
                 ctx.set_contents(selection.to_owned())
                     .unwrap();
                 let _content: String = ctx
@@ -114,25 +114,24 @@ impl App {
     }
 }
 
-fn main() {
+#[tokio::main(flavor = "current_thread")]
+async fn main() {
+    let mut requests = json_input_stream(async_stdin());
     let mut app: App = App::new();
-    let stdin: io::Stdin = io::stdin();
 
-    for line in stdin.lock().lines() {
-        let line: String = match line {
-            Ok(line) => line,
-            Err(_) => continue,
-        };
-
-        let request: serde_json::Value = serde_json::from_str(&line).unwrap_or(serde_json::Value::Null);
-
-        if let Some(query) = request.get("Search").and_then(|v| v.as_str()) {
-            app.search(query);
-            continue;
-        }
-
-        if let Some(index) = request.get("Activate").and_then(|v| v.as_u64()) {
-            app.activate(index as usize);
+    while let Some(result) = requests.next().await {
+        match result {
+            Ok(request) => match request {
+                Request::Activate(id) => app.activate(id),
+                // Request::ActivateContext { .. } => app.activate_context().await,
+                // Request::Context(_) => app.context().await,
+                Request::Search(query) => app.search(&query),
+                Request::Exit => break,
+                _ => (),
+            },
+            Err(why) => {
+                tracing::error!("malformed JSON input: {}", why);
+            }
         }
     }
 }

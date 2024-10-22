@@ -8,6 +8,9 @@ strip = true
 
 [dependencies]
 copypasta = "0.10.1"
+futures-lite = "2.3.0"
 pop-launcher = "1.1.0"
 serde = "1.0.210"
 serde_json = "1.0.128"
+tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread"] }
+tracing = "0.1.40"
